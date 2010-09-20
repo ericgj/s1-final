@@ -1,5 +1,6 @@
 require 'set'
 
+module RMU
 module Data
 class Table
 
@@ -16,8 +17,7 @@ class Table
     @row_cache, @col_cache, @cell_cache = {}, {}, {}
     opts = args.last.is_a?(Hash) ? args.pop : DEFAULT_OPTIONS
     @headers = opts[:headers] if opts[:headers]
-    append_rows(rows)
-    self
+    append_rows(*args) unless args.empty?
   end
    
   def col_count
@@ -25,20 +25,24 @@ class Table
   end
   
   def row_count
-    (data/colsize).to_i
+    col_count == 0 ? 0 : (data.size/col_count).to_i
   end
   
   def row(n)
+    return nil unless n <= row_count
     @row_cache[n] ||= Data::Row.new(self, n)
   end
   
   def col(n_or_name)
     n = headers.index {|h| h == n_or_name} || n_or_name
+    return nil unless n && n <= col_count
     @col_cache[n] ||= Data::Col.new(self, n)
   end
   
   def cell(nrow, ncol_or_name)
     ncol = headers.index {|h| h == ncol_or_name} || ncol_or_name
+    return nil unless nrow <= row_count
+    return nil unless ncol && n <= col_count
     @cell_cache[[nrow, ncol]] ||= Data::Cell.new(self, nrow, ncol)
   end
   
@@ -110,7 +114,7 @@ class Table
   #
   def insert_rows(*args)
     after, before = nil, nil
-    opts, rows = args.pop, args
+    opts, input = args.pop, args
     case opts
     when Numeric
       after = opts
@@ -118,26 +122,31 @@ class Table
       after = opts[:after]
       before = opts[:before]
     when NilClass
-      rows = opts
+    when Array
+      input += opts
+    else
+      input << opts
     end
-    rows = [rows] unless rows.first.is_a?(Array)
+    input = [input] unless input.first.is_a?(Array)
+    #puts "input: #{input.inspect}"
     # get max column count and assign default headers
     if @headers.empty?
-      n = rows.max {|r| r.size}.size
-      @headers = (0..(n - 1)).to_a
+      n = input.max {|a, b| a.size <=> b.size}.size
+      @headers = (0..(n - 1)).to_a if n > 0
     end
+    #puts "headers: #{headers.to_a.inspect}"
     # pad rows based on headers (or raise error if size of row > size of headers)
-    rows.each {|r| r = pad_columns!(r, @headers.size)}
+    input.each {|r| r = pad_columns!(r, @headers.size)}
     unless after or before
-      @data += rows.flatten
+      @data += input.flatten
     else
       if after
         after = [after, row_count].max
-        @data.insert(index_of_next_row_start(after), rows.flatten)
+        @data.insert(index_of_next_row_start(after), input.flatten)
       end
       if before
         before = [before, row_count].max
-        @data.insert(index_of_row_start(before), rows.flatten)
+        @data.insert(index_of_row_start(before), input.flatten)
       end
     end
     self
@@ -200,12 +209,15 @@ class Table
   end
   
   def pad_columns!(data, n, default = nil)
-    #TODO
+    if n > data.size
+      (data.size..(n-1)).each {|i| data[i] = default}
+    end
   end
   
   def pad_rows!(data, n, default = nil)
     #TODO
   end
   
+end
 end
 end
