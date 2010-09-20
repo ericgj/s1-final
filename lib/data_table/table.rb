@@ -9,15 +9,17 @@ class Table
   
   DEFAULT_OPTIONS = {}
   
-  def initialize(*args)
+  def initialize(rdata = [], opts = DEFAULT_OPTIONS)
     @data = []
     #TODO: not sure SortedSet is what we want since it swallows duplicates
     # instead of raising error
     @headers = SortedSet.new
     @row_cache, @col_cache, @cell_cache = {}, {}, {}
-    opts = args.last.is_a?(Hash) ? args.pop : DEFAULT_OPTIONS
     @headers = opts[:headers] if opts[:headers]
-    append_rows(*args) unless args.empty?
+    rdata = [rdata] unless rdata.first.is_a?(Array)
+    unless rdata.empty? 
+      rdata.each {|r| append_row(r)}
+    end
   end
    
   def col_count
@@ -99,65 +101,58 @@ class Table
   end
   
  
-  def append_rows(*args)
-    insert_rows(*args)
+  def append_row(*args)
+    insert_row(*args)
   end
   
-  def append_cols(*args)
-    insert_cols(*args)
+  def append_col(*args)
+    insert_col(*args)
   end
   
   # signatures:
-  #   Array           insert 1+ rows at end
-  #   Array, Numeric  insert 1+ rows after n row
-  #   Array, Hash     insert 1+ rows :after => n or :before => n
+  #   Array           insert 1 row at end
+  #   Array, Numeric  insert 1 row before n row
+  #   Array, Hash     insert 1 row :after => n or :before => n
   #
-  def insert_rows(*args)
+  def insert_row(*args)
     after, before = nil, nil
-    opts, input = args.pop, args
+    opts = (Hash === args.last || Numeric === args.last) ? args.pop : {}
     case opts
     when Numeric
-      after = opts
+      before = opts
     when Hash
       after = opts[:after]
       before = opts[:before]
-    when NilClass
-    when Array
-      input += opts
-    else
-      input << opts
     end
-    input = [input] unless input.first.is_a?(Array)
-    #puts "input: #{input.inspect}"
-    # get max column count and assign default headers
+    input = args.flatten
+    # get input column count and assign default headers
     if @headers.empty?
-      n = input.max {|a, b| a.size <=> b.size}.size
-      @headers = (0..(n - 1)).to_a if n > 0
+      n = input.size
+      @headers = SortedSet.new((0..(n - 1)).to_a) if n > 0
     end
-    #puts "headers: #{headers.to_a.inspect}"
-    # pad rows based on headers (or raise error if size of row > size of headers)
-    input.each {|r| r = pad_columns!(r, @headers.size)}
+    # pad or truncate row based on headers
+    input = normalized_columns(input, @headers.size)
     unless after or before
-      @data += input.flatten
+      @data += input
     else
       if after
-        after = [after, row_count].max
-        @data.insert(index_of_next_row_start(after), input.flatten)
+        after = [after, row_count].min
+        @data.insert( [index_of_next_row_start(after), @data.size].min, *input)
       end
       if before
-        before = [before, row_count].max
-        @data.insert(index_of_row_start(before), input.flatten)
+        before = [before, row_count].min
+        @data.insert(index_of_row_start(before), *input)
       end
     end
     self
   end
   
   # signatures:
-  #   Array           insert 1+ cols at end
-  #   Array, Numeric  insert 1+ cols after n row
-  #   Array, Hash     insert 1+ cols :after => n or :before => n
+  #   Array           insert 1 cols at end
+  #   Array, Numeric  insert 1 cols before n row
+  #   Array, Hash     insert 1 cols :after => n or :before => n
   #
-  def insert_cols(*args)
+  def insert_col(*args)
     self
   end
   
@@ -208,13 +203,17 @@ class Table
     (n+1) * row_count
   end
   
-  def pad_columns!(data, n, default = nil)
-    if n > data.size
-      (data.size..(n-1)).each {|i| data[i] = default}
+  def normalized_columns(rdata, n, default = nil)
+    if n > rdata.size
+      (rdata.size..(n-1)).each {|i| rdata[i] = default}
+    elsif n < rdata.size
+      Kernel.warn "Note: row truncated from #{rdata.size} to #{n} columns"
+      rdata = rdata[0,n]
     end
+    rdata
   end
   
-  def pad_rows!(data, n, default = nil)
+  def normalized_rows(cdata, n, default = nil)
     #TODO
   end
   

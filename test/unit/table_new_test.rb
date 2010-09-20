@@ -29,7 +29,7 @@ class TableNewTest_WhenHeadersAndNoData < Test::Unit::TestCase
 
   def setup
     @input = %w(one two three four)
-    @subject = RMU::Data::Table.new(:headers => @input)  
+    @subject = RMU::Data::Table.new([], :headers => @input)  
   end
   
   must "be empty" do
@@ -45,7 +45,7 @@ class TableNewTest_WhenHeadersAndNoData < Test::Unit::TestCase
   end
   
   must "have headers == input headers array" do
-    assert_equal @input, @subject.headers
+    assert_equal @input, @subject.headers.to_a
   end
   
 end
@@ -53,12 +53,12 @@ end
 class TableNewTest_WhenSimpleArray < Test::Unit::TestCase
 
   def setup
-    @input = [1,2,3,4]
+    @input = [[1,2,3,4]]
     @subject = RMU::Data::Table.new(@input)
   end
   
-  must "data be equal to given array" do
-    assert_equal @input, @subject.data
+  must "data be equal to given array flattened" do
+    assert_equal @input.flatten, @subject.data
   end
   
   must "have row_count == 1" do
@@ -66,7 +66,7 @@ class TableNewTest_WhenSimpleArray < Test::Unit::TestCase
   end
   
   must "have col_count == size of input array" do
-    assert_equal @input.size, @subject.col_count
+    assert_equal 4, @subject.col_count
   end
   
 end
