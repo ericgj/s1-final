@@ -1,4 +1,3 @@
-require 'set'
 
 module RMU
 module Data
@@ -11,9 +10,7 @@ class Table
   
   def initialize(rdata = [], opts = DEFAULT_OPTIONS)
     @data = []
-    #TODO: not sure SortedSet is what we want since it swallows duplicates
-    # instead of raising error
-    @headers = SortedSet.new
+    @headers = []
     @row_cache, @col_cache, @cell_cache = {}, {}, {}
     @headers = opts[:headers] if opts[:headers]
     rdata = [rdata] unless rdata.first.is_a?(Array)
@@ -128,7 +125,7 @@ class Table
     # get input column count and assign default headers
     if @headers.empty?
       n = input.size
-      @headers = SortedSet.new((0..(n - 1)).to_a) if n > 0
+      @headers = (0..(n - 1)).to_a if n > 0
     end
     # pad or truncate row based on headers
     input = normalized_columns(input, @headers.size)
@@ -153,6 +150,42 @@ class Table
   #   Array, Hash     insert 1 cols :after => n or :before => n
   #
   def insert_col(*args)
+    after, before = nil, nil
+    opts = (Hash === args.last || Numeric === args.last) ? args.pop : {}
+    case opts
+    when Numeric
+      before = opts
+    when Hash
+      name = opts[:name]    # TODO deal with case if name not passed
+      after = opts[:after]
+      before = opts[:before]
+    else
+      after = col_count
+    end
+    #TODO lookup after, before if not Numeric
+    input = args.flatten
+    # pad or truncate column based on row count
+    input = normalized_rows(input, row_count)    
+    if after
+      after = [after, col_count].min
+      i = -1
+      @data = \
+        @data.inject([]) do |memo, it|
+          i += 1
+          memo << it
+          if (i % col_count) == after
+            memo << input.shift
+          end
+          memo
+        end
+      if name
+        @headers.insert((-1 * after), name)
+      else
+        @headers = (0..@headers.size).to_a
+      end
+    if before
+    
+    end
     self
   end
   
