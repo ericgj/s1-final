@@ -1,26 +1,25 @@
+require 'set'
 
 module Data
 class Table
 
   attr_reader :data
-  attr_reader :headers
+  attr_accessor :headers
   
   DEFAULT_OPTIONS = {}
   
   def initialize(*args)
-    opts = args.last.is_a?(Hash) ? args.pop : DEFAULT_OPTIONS
-    rows = args.first.is_a?(Array) ? args : [args]
-    # get max column count and assign default headers
-    n = rows.max {|r| r.size}.size
-    @headers = (0..(n - 1)).to_a
-    if opts[:headers]
-      opts[:headers].each_with_index {|h, i| @headers[i] = h}
-    end
+    @data = []
+    #TODO: not sure SortedSet is what we want since it swallows duplicates
+    # instead of raising error
+    @headers = SortedSet.new
     @row_cache, @col_cache, @cell_cache = {}, {}, {}
+    opts = args.last.is_a?(Hash) ? args.pop : DEFAULT_OPTIONS
+    @headers = opts[:headers] if opts[:headers]
     append_rows(rows)
     self
   end
-  
+   
   def col_count
     headers.size
   end
@@ -96,15 +95,12 @@ class Table
   end
   
  
-  # TODO really better to do this in more general insert_rows
   def append_rows(*args)
-    rows = args.first.is_a?(Array) ? args : [args]
-    rows.each {|r| r = pad_columns!(r, n)}
-    @data += rows.flatten
-    self
+    insert_rows(*args)
   end
   
   def append_cols(*args)
+    insert_cols(*args)
   end
   
   # signatures:
@@ -113,6 +109,38 @@ class Table
   #   Array, Hash     insert 1+ rows :after => n or :before => n
   #
   def insert_rows(*args)
+    after, before = nil, nil
+    opts, rows = args.pop, args
+    case opts
+    when Numeric
+      after = opts
+    when Hash
+      after = opts[:after]
+      before = opts[:before]
+    when NilClass
+      rows = opts
+    end
+    rows = [rows] unless rows.first.is_a?(Array)
+    # get max column count and assign default headers
+    if @headers.empty?
+      n = rows.max {|r| r.size}.size
+      @headers = (0..(n - 1)).to_a
+    end
+    # pad rows based on headers (or raise error if size of row > size of headers)
+    rows.each {|r| r = pad_columns!(r, @headers.size)}
+    unless after or before
+      @data += rows.flatten
+    else
+      if after
+        after = [after, row_count].max
+        @data.insert(index_of_next_row_start(after), rows.flatten)
+      end
+      if before
+        before = [before, row_count].max
+        @data.insert(index_of_row_start(before), rows.flatten)
+      end
+    end
+    self
   end
   
   # signatures:
@@ -121,6 +149,7 @@ class Table
   #   Array, Hash     insert 1+ cols :after => n or :before => n
   #
   def insert_cols(*args)
+    self
   end
   
   def delete_row(n)
@@ -136,11 +165,39 @@ class Table
   end
   
 
+  def header(n)
+  end
+  
+  # Call from Data::Col#header=
+  def update_header(ncol_or_name, name)
+  end
+  
+  
+  def cell_value(nrow, ncol_or_name)
+  end
+  
+  # Call from Data::Cell#value=
   def update_cell_value(nrow, ncol_or_name, value)
   end
   
   
   private
+  
+  def index_of_row_start(n)
+    n * col_count
+  end
+  
+  def index_of_next_row_start(n)
+    (n+1) * col_count
+  end
+  
+  def index_of_col_start(n)
+    n * row_count
+  end
+  
+  def index_of_next_col_start(n)
+    (n+1) * row_count
+  end
   
   def pad_columns!(data, n, default = nil)
     #TODO
