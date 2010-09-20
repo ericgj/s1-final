@@ -1,3 +1,4 @@
+module RMU
 module Data
   class Row
     include Enumerable
@@ -26,4 +27,5 @@ module Data
     
   end
 
+end
 end

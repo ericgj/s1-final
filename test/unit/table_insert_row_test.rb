@@ -2,7 +2,7 @@ require 'test/helper'
 require 'lib/data_table/table'
 
 #----------------------------------------
-#  Tests of default inserts into empty table
+#  Tests of default inserts (appends) into empty table
 #----------------------------------------
 class TableInsertRowTest_WhenNoArgs < Test::Unit::TestCase
 
@@ -210,3 +210,13 @@ class TableInsertRowTest_WhenJaggedArray < Test::Unit::TestCase
   end
   
 end
+
+
+#----------------------------------------
+#  Tests of inserts before
+#----------------------------------------
+
+
+#----------------------------------------
+#  Tests of inserts after
+#----------------------------------------

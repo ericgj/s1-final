@@ -1,3 +1,4 @@
+module RMU
 module Data
   class Cell
 
@@ -21,4 +22,5 @@ module Data
     
     
   end
+end
 end

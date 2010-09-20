@@ -30,13 +30,13 @@ class Table
   
   def row(n)
     return nil unless n <= row_count
-    @row_cache[n] ||= Data::Row.new(self, n)
+    @row_cache[n] ||= Row.new(self, n)
   end
   
   def col(n_or_name)
     n = headers.index {|h| h == n_or_name} || n_or_name
     return nil unless n && n <= col_count
-    @col_cache[n] ||= Data::Col.new(self, n)
+    @col_cache[n] ||= Col.new(self, n)
   end
   
   def cell(nrow, ncol_or_name)
@@ -46,7 +46,7 @@ class Table
     @cell_cache[[nrow, ncol]] ||= Data::Cell.new(self, nrow, ncol)
   end
   
-  # iterators -- maybe better to extract these into Data::Rows, Data::Cols < Array ?
+  # iterators -- maybe better to extract these into Rows, Cols < Array ?
   #
   def rows(range = nil)
     range ||= (0..row_count)
@@ -177,7 +177,7 @@ class Table
   def header(n)
   end
   
-  # Call from Data::Col#header=
+  # Call from Col#header=
   def update_header(ncol_or_name, name)
   end
   

@@ -1,3 +1,4 @@
+module RMU
 module Data
   class Column
     include Enumerable
@@ -36,4 +37,4 @@ module Data
     
   Col = Column
 end
-
+end
