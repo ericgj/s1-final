@@ -175,7 +175,7 @@ class Table
       input = normalized_rows(input)    
       
       if after
-        after = [after, col_count].min
+        after = [after, (col_count - 1)].min
         i = -1
         @data = \
           @data.inject([]) do |memo, it|

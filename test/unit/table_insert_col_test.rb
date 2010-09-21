@@ -251,6 +251,141 @@ end
 
 # TODO
 
+class TableInsertColTest_AfterWhenEmpty < Test::Unit::TestCase
+
+  def setup
+    @input = [1,2,3,4]
+    @subject = RMU::Data::Table.new
+    @subject.insert_col(@input, :after => 99)
+  end
+  
+  must "data be equal to the given array flattened" do
+    assert_equal @input.flatten, @subject.data
+  end
+  
+  must "have row_count == size of input array" do
+    assert_equal 4, @subject.row_count
+  end
+  
+  must "have col_count == 1" do
+    assert_equal 1, @subject.col_count
+  end
+  
+end
+
+class TableInsertColTest_AfterWhenOneCol < Test::Unit::TestCase
+
+  def setup
+    @input = [5,6,7,8]
+    @subject = RMU::Data::Table.new([[1],[2],[3],[4]])
+    @subject.insert_col(@input, :after => 0)
+  end
+  
+  must "data be equal to the existing array with the inserted col flattened" do
+    assert_equal [1,5,2,6,3,7,4,8], @subject.data
+  end
+  
+  must "have row_count == size of input array" do
+    assert_equal 4, @subject.row_count
+  end
+  
+  must "have col_count == 2" do
+    assert_equal 2, @subject.col_count
+  end
+  
+end
+
+
+class TableInsertColTest_AfterWhenOneColAfterEOF < Test::Unit::TestCase
+
+  def setup
+    @input = [5,6,7,8]
+    @subject = RMU::Data::Table.new([[1],[2],[3],[4]])
+    @subject.insert_col(@input, :after => 2)
+  end
+  
+  must "data be equal to the existing array with the inserted col flattened" do
+    assert_equal [1,5,2,6,3,7,4,8], @subject.data
+  end
+  
+  must "have row_count == size of input array" do
+    assert_equal 4, @subject.row_count
+  end
+  
+  must "have col_count == 2" do
+    assert_equal 2, @subject.col_count
+  end
+  
+end
+
+class TableInsertColTest_AfterWhenThreeCols < Test::Unit::TestCase
+
+  def setup
+    @input = [2,6,10]
+    @subject = RMU::Data::Table.new([[1,3,4],[5,7,8],[9,11,12]])
+    @subject.insert_col(@input, :after => 0)
+  end
+  
+  must "data be equal to the existing array with the inserted col flattened" do
+    assert_equal [1,2,3,4,5,6,7,8,9,10,11,12], @subject.data
+  end
+  
+  must "have row_count == size of input array" do
+    assert_equal 3, @subject.row_count
+  end
+  
+  must "have col_count == 4" do
+    assert_equal 4, @subject.col_count
+  end
+  
+end
+
+class TableInsertColTest_AfterWhenMoreRows < Test::Unit::TestCase
+
+  def setup
+    @input = [5,6,7,8,9,10,11,12]
+    @subject = RMU::Data::Table.new([[1],[2],[3],[4]])
+    @subject.insert_col(@input, :after => 0)
+  end
+  
+  must "data be equal to the existing array with the inserted row truncated and flattened" do
+    assert_equal [1,5,2,6,3,7,4,8], @subject.data
+  end
+  
+  must "have row_count == 4" do
+    assert_equal 4, @subject.row_count
+  end
+  
+  must "have col_count == 2" do
+    assert_equal 2, @subject.col_count
+  end
+  
+end
+
+class TableInsertColTest_AfterWhenLessRows < Test::Unit::TestCase
+
+  def setup
+    @input = [5]
+    @subject = RMU::Data::Table.new([[1],[2],[3],[4]])
+    @subject.insert_col(@input, :after => 0)
+  end
+  
+  must "data be equal to the existing array with the inserted col padded and flattened" do
+    assert_equal [1,5,2,nil,3,nil,4,nil], @subject.data
+  end
+  
+  must "have row_count == 4" do
+    assert_equal 4, @subject.row_count
+  end
+  
+  must "have col_count == 2" do
+    assert_equal 2, @subject.col_count
+  end
+  
+end
+
+
+
 __END__
 
 # Possibly this case should raise error instead
