@@ -14,7 +14,7 @@ The following requirements are implemented:
 - row get (not tested)
 - col append
 - col delete
-- col insert <strike>(:after not tested)</strike>
+- col insert
 - col get (not tested)
 
 These requirements are sketched but not yet implemented:
@@ -22,9 +22,7 @@ These requirements are sketched but not yet implemented:
 - column headers
 - cell contents get and set
 - row map
-- <strike>row delete</strike>
 - col map
-- <strike>col delete</strike>
 - table reduce by row
 - table reduce by col
 
