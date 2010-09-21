@@ -245,11 +245,15 @@ class TableInsertColTest_BeforeWhenThreeColsSpecifyingNumber < Test::Unit::TestC
   
 end
 
+class TableInsertColTest_BeforeWhenThreeColsSpecifyingName < Test::Unit::TestCase
+  
+end
+
+
 #----------------------------------------
 #  Tests of inserts after
 #----------------------------------------
 
-# TODO
 
 class TableInsertColTest_AfterWhenEmpty < Test::Unit::TestCase
 
@@ -384,6 +388,9 @@ class TableInsertColTest_AfterWhenLessRows < Test::Unit::TestCase
   
 end
 
+class TableInsertColTest_AfterWhenThreeColsSpecifyingName < Test::Unit::TestCase
+  
+end
 
 
 __END__

@@ -141,7 +141,6 @@ class Table
     end
     
     init_caches
-    
     self
   end
   
@@ -221,18 +220,27 @@ class Table
     self
   end
   
-  # TODO
+  # TODO: Test
   
-  def delete_row(n)
+  def delete_row_data(n)
+    return self if row_count == 0
+    n = [n, (row_count - 1)].min
+    @data.slice!(
+      index_of_row_start(n)..(index_of_next_row_start(n)-1)
+    )
+    init_caches
+    self
   end
   
-  def delete_col(n_or_name)
-  end
-  
-  def delete_rows(range, &blk)
-  end
-  
-  def delete_cols(range, &blk)
+  def delete_col_data(n_or_name)
+    return self if col_count == 0
+    n = [n, (col_count - 1)].min
+    (0..(row_count-1)).each do |irow|
+      @data.delete_at(index_of_row_start(irow) + n)
+    end
+    delete_header(n)
+    init_caches
+    self
   end
   
 
@@ -275,19 +283,27 @@ class Table
     @headers.insert(at, name)
   end
   
+  def delete_header(at)
+    @headers.delete_at(at)
+  end
+  
   def index_of_row_start(n)
+    raise NotImplementedError if n < 0
     n * col_count
   end
   
   def index_of_next_row_start(n)
+    raise NotImplementedError if n < 0
     (n+1) * col_count
   end
   
   def index_of_col_start(n)
+    raise NotImplementedError if n < 0
     n * row_count
   end
   
   def index_of_next_col_start(n)
+    raise NotImplementedError if n < 0
     (n+1) * row_count
   end
   
