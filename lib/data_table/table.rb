@@ -10,9 +10,8 @@ class Table
   
   def initialize(rdata = [], opts = DEFAULT_OPTIONS)
     @data = []
-    @headers = []
-    @row_cache, @col_cache, @cell_cache = {}, {}, {}
-    @headers = opts[:headers] if opts[:headers]
+    init_caches
+    init_headers(opts[:headers] || [])
     rdata = [rdata] unless rdata.first.is_a?(Array)
     unless rdata.empty? 
       rdata.each {|r| append_row(r)}
@@ -122,13 +121,12 @@ class Table
       before = opts[:before]
     end
     input = args.flatten
+    
     # get input column count and assign default headers
-    if @headers.empty?
-      n = input.size
-      @headers = (0..(n - 1)).to_a if n > 0
-    end
+    init_blank_headers(input.size) if @headers.empty?
+    
     # pad or truncate row based on headers
-    input = normalized_columns(input, @headers.size)
+    input = normalized_columns(input)
     unless after or before
       @data += input
     else
@@ -141,6 +139,9 @@ class Table
         @data.insert(index_of_row_start(before), *input)
       end
     end
+    
+    init_caches
+    
     self
   end
   
@@ -156,7 +157,7 @@ class Table
     when Numeric
       before = opts
     when Hash
-      name = opts[:name]    # TODO deal with case if name not passed
+      name = opts[:name]
       after = opts[:after]
       before = opts[:before]
     else
@@ -164,28 +165,59 @@ class Table
     end
     #TODO lookup after, before if not Numeric
     input = args.flatten
-    # pad or truncate column based on row count
-    input = normalized_rows(input, row_count)    
-    if after
-      after = [after, col_count].min
-      i = -1
-      @data = \
-        @data.inject([]) do |memo, it|
-          i += 1
-          memo << it
-          if (i % col_count) == after
-            memo << input.shift
+        
+    if @data.empty? && !input.empty?
+      @data = input
+      name ? init_headers(name) : init_blank_headers(1)
+    else
+      
+      # pad or truncate column based on row count
+      input = normalized_rows(input)    
+      
+      if after
+        after = [after, col_count].min
+        i = -1
+        @data = \
+          @data.inject([]) do |memo, it|
+            i += 1
+            memo << it
+            if (i % col_count) == after
+              memo << input.shift
+            end
+            memo
           end
-          memo
+        
+        if name
+          insert_header((-1 * after), name)
+        else
+          init_blank_headers(@headers.size + 1)
         end
-      if name
-        @headers.insert((-1 * after), name)
-      else
-        @headers = (0..@headers.size).to_a
+        
       end
-    if before
     
+      if before
+        before = [before, col_count].min
+        i = -1
+        @data = \
+          @data.inject([]) do |memo, it|
+            i += 1
+            if (i % col_count) == before
+              memo << input.shift
+            end
+            memo << it
+            memo
+          end
+          
+        if name
+          insert_header(before, name)
+        else
+          init_blank_headers(@headers.size + 1)
+        end
+      end
+
     end
+    
+    init_caches
     self
   end
   
@@ -218,7 +250,28 @@ class Table
   end
   
   
-  private
+  protected
+  
+  def init_caches
+    @row_cache, @col_cache, @cell_cache = {}, {}, {}
+  end
+  
+  #TODO: these header operations should be moved to a separate class
+  
+  def init_headers(names = [])
+    names = [names] unless names.is_a?(Array)
+    @headers = []
+    names.each_with_index {|name, i| @headers[i] = name}
+  end
+  
+  def init_blank_headers(n)
+    @headers = []
+    (0..(n-1)).each {|i| @headers[i] = nil} if n > 0
+  end
+  
+  def insert_header(at, name)
+    @headers.insert(at, name)
+  end
   
   def index_of_row_start(n)
     n * col_count
@@ -236,18 +289,22 @@ class Table
     (n+1) * row_count
   end
   
-  def normalized_columns(rdata, n, default = nil)
-    if n > rdata.size
-      (rdata.size..(n-1)).each {|i| rdata[i] = default}
-    elsif n < rdata.size
-      Kernel.warn "Note: row truncated from #{rdata.size} to #{n} columns"
-      rdata = rdata[0,n]
-    end
-    rdata
+  def normalized_columns(rdata, default = nil)
+    padded_or_truncated_array(rdata, col_count, default)
   end
   
-  def normalized_rows(cdata, n, default = nil)
-    #TODO
+  def normalized_rows(cdata, default = nil)
+    padded_or_truncated_array(cdata, row_count, default)
+  end
+  
+  def padded_or_truncated_array(array, n, default = nil)
+    if n > array.size
+      (array.size..(n-1)).each {|i| array[i] = default}
+    elsif n < array.size
+      Kernel.warn "Note: data truncated to #{n} from #{array.size}"
+      array = array[0,n]
+    end
+    array
   end
   
 end

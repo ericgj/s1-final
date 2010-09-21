@@ -85,11 +85,7 @@ class TableInsertRowTest_WhenSimpleNonNumericValue < Test::Unit::TestCase
   must "have col_count == size of input array" do
     assert_equal @input.size, @subject.col_count
   end
-  
-  must "have headers named sequentially" do
-    assert_equal (0..@input.size-1).to_a, @subject.headers.to_a
-  end
-  
+    
 end
 
 class TableInsertRowTest_WhenSimpleNonNumericValues < Test::Unit::TestCase
@@ -112,10 +108,6 @@ class TableInsertRowTest_WhenSimpleNonNumericValues < Test::Unit::TestCase
     assert_equal @input.size, @subject.col_count
   end
   
-  must "have headers named sequentially" do
-    assert_equal (0..@input.size-1).to_a, @subject.headers.to_a
-  end
-  
 end
 
 class TableInsertRowTest_WhenSimpleArray < Test::Unit::TestCase
@@ -136,10 +128,6 @@ class TableInsertRowTest_WhenSimpleArray < Test::Unit::TestCase
   
   must "have col_count == size of input array" do
     assert_equal @input.size, @subject.col_count
-  end
-  
-  must "have headers named sequentially" do
-    assert_equal (0..@input.size-1).to_a, @subject.headers.to_a
   end
   
 end
