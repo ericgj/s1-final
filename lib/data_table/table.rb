@@ -7,7 +7,7 @@ class Table
   attr_accessor :headers
   
   DEFAULT_OPTIONS = {}
-  
+    
   def initialize(rdata = [], opts = DEFAULT_OPTIONS)
     @data = []
     init_caches
@@ -166,57 +166,23 @@ class Table
     input = args.flatten
         
     if @data.empty? && !input.empty?
-      @data = input
-      name ? init_headers(name) : init_blank_headers(1)
+      col_init!(input, name)
     else
       
       # pad or truncate column based on row count
       input = normalized_rows(input)    
       
       if after
-        after = [after, (col_count - 1)].min
-        i = -1
-        @data = \
-          @data.inject([]) do |memo, it|
-            i += 1
-            memo << it
-            if (i % col_count) == after
-              memo << input.shift
-            end
-            memo
-          end
-        
-        if name
-          insert_header((-1 * after), name)
-        else
-          init_blank_headers(headers.size + 1)
-        end
-        
-      end
-    
+        col_insert_after!(after, input, name)
+      end   
       if before
-        before = [before, (col_count - 1)].min
-        i = -1
-        @data = \
-          @data.inject([]) do |memo, it|
-            i += 1
-            if (i % col_count) == before
-              memo << input.shift
-            end
-            memo << it
-            memo
-          end
-          
-        if name
-          insert_header(before, name)
-        else
-          init_blank_headers(headers.size + 1)
-        end
+        col_insert_before!(before, input, name)
       end
-
+        
     end
     
-    init_caches
+    ### Note not needed: done in col_insert_* methods
+    # init_caches
     self
   end
   
@@ -229,24 +195,11 @@ class Table
     init_caches
     self
   end
-  
-  # TODO: Test
-  
+    
   def delete_col_data(n_or_name)
     return self if col_count == 0
     n = header_index(n_or_name)
-    n = [n, (col_count - 1)].min
-    i = -1
-    @data = \
-      @data.inject([]) do |memo, it|
-        i += 1
-        unless (i % col_count) == n
-          memo << it
-        end
-        memo
-      end
-    delete_header(n)
-    init_caches
+    col_delete!(n)
     self
   end
   
@@ -341,6 +294,74 @@ class Table
       array = array[0,n]
     end
     array
+  end
+  
+  #--- column operations that reassign @data and modify @headers
+  
+  def col_init!(cdata, name = nil)
+    @data = cdata
+    name ? init_headers(name) : init_blank_headers(1)
+    init_caches
+    self
+  end
+  
+  def col_insert_before!(pos, cdata, name = nil)
+    pos = [pos, (col_count - 1)].min
+    i = -1
+    @data = \
+      @data.inject([]) do |memo, it|
+        i += 1
+        if (i % col_count) == pos
+          memo << cdata.shift
+        end
+        memo << it
+        memo
+      end
+      
+    if name
+      insert_header(pos, name)
+    else
+      init_blank_headers(headers.size + 1)
+    end
+    init_caches
+    self
+  end
+  
+  def col_insert_after!(pos, cdata, name = nil)
+    pos = [pos, (col_count - 1)].min
+    i = -1
+    @data = \
+      @data.inject([]) do |memo, it|
+        i += 1
+        memo << it
+        if (i % col_count) == pos
+          memo << cdata.shift
+        end
+        memo
+      end
+    if name
+      insert_header((-1 * pos), name)
+    else
+      init_blank_headers(headers.size + 1)
+    end
+    init_caches
+    self
+  end
+  
+  def col_delete!(pos)
+    pos = [pos, (col_count - 1)].min
+    i = -1
+    @data = \
+      @data.inject([]) do |memo, it|
+        i += 1
+        unless (i % col_count) == pos
+          memo << it
+        end
+        memo
+      end
+    delete_header(pos)
+    init_caches
+    self
   end
   
 end
