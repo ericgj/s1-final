@@ -220,8 +220,6 @@ class Table
     self
   end
   
-  # TODO: Test
-  
   def delete_row_data(n)
     return self if row_count == 0
     n = [n, (row_count - 1)].min
@@ -232,20 +230,40 @@ class Table
     self
   end
   
+  # TODO: Test
+  
   def delete_col_data(n_or_name)
     return self if col_count == 0
+    n = header_index(n_or_name)
     n = [n, (col_count - 1)].min
-    (0..(row_count-1)).each do |irow|
-      @data.delete_at(index_of_row_start(irow) + n)
-    end
+    i = -1
+    @data = \
+      @data.inject([]) do |memo, it|
+        i += 1
+        unless (i % col_count) == n
+          memo << it
+        end
+        memo
+      end
     delete_header(n)
     init_caches
     self
   end
   
 
-  def header(n)
-    headers[n]
+  def header(n_or_name)
+    headers[header_index(n_or_name)]
+  end
+  
+  def header_index(n_or_name)
+    idx = \
+      if Numeric === n_or_name && n_or_name < col_count
+        n_or_name >= 0 ? n_or_name : col_count + n_or_name
+      else
+        headers.index(n_or_name)
+      end
+    raise ArgumentError, "Unknown header or column index '#{n_or_name}'" if idx == nil
+    idx
   end
   
   # Call from Col#header=
