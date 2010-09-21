@@ -87,7 +87,172 @@ class TableInsertColTest_WhenSimpleNonNumericValues < Test::Unit::TestCase
 end
 
 
+#----------------------------------------
+#  Tests of inserts before
+#----------------------------------------
+class TableInsertColTest_BeforeWhenEmpty < Test::Unit::TestCase
+
+  def setup
+    @input = [1,2,3,4]
+    @subject = RMU::Data::Table.new
+    @subject.insert_col(@input, :before => 99)
+  end
+  
+  must "data be equal to the given array flattened" do
+    assert_equal @input.flatten, @subject.data
+  end
+  
+  must "have row_count == size of input array" do
+    assert_equal 4, @subject.row_count
+  end
+  
+  must "have col_count == 1" do
+    assert_equal 1, @subject.col_count
+  end
+  
+end
+
+class TableInsertColTest_BeforeWhenOneCol < Test::Unit::TestCase
+
+  def setup
+    @input = [5,6,7,8]
+    @subject = RMU::Data::Table.new([[1],[2],[3],[4]])
+    @subject.insert_col(@input, :before => 0)
+  end
+  
+  must "data be equal to the existing array with the inserted col flattened" do
+    assert_equal [5,1,6,2,7,3,8,4], @subject.data
+  end
+  
+  must "have row_count == size of input array" do
+    assert_equal 4, @subject.row_count
+  end
+  
+  must "have col_count == 2" do
+    assert_equal 2, @subject.col_count
+  end
+  
+end
+
+class TableInsertColTest_BeforeWhenOneColAfterEOF < Test::Unit::TestCase
+
+  def setup
+    @input = [5,6,7,8]
+    @subject = RMU::Data::Table.new([[1],[2],[3],[4]])
+    @subject.insert_col(@input, :before => 2)
+  end
+  
+  must "data be equal to the existing array with the inserted row flattened" do
+    assert_equal [5,1,6,2,7,3,8,4], @subject.data
+  end
+  
+  must "have row_count == size of input array" do
+    assert_equal 4, @subject.row_count
+  end
+  
+  must "have col_count == 2" do
+    assert_equal 2, @subject.col_count
+  end
+  
+end
+
+class TableInsertColTest_BeforeWhenThreeCols < Test::Unit::TestCase
+
+  def setup
+    @input = [2,6,10]
+    @subject = RMU::Data::Table.new([[1,3,4],[5,7,8],[9,11,12]])
+    @subject.insert_col(@input, :before => 1)
+  end
+  
+  must "data be equal to the existing array with the inserted col flattened" do
+    assert_equal [1,2,3,4,5,6,7,8,9,10,11,12], @subject.data
+  end
+  
+  must "have row_count == size of input array" do
+    assert_equal 3, @subject.row_count
+  end
+  
+  must "have col_count == 4" do
+    assert_equal 4, @subject.col_count
+  end
+  
+end
+
+class TableInsertColTest_BeforeWhenMoreRows < Test::Unit::TestCase
+
+  def setup
+    @input = [5,6,7,8,9,10,11,12]
+    @subject = RMU::Data::Table.new([[1],[2],[3],[4]])
+    @subject.insert_col(@input, :before => 0)
+  end
+  
+  must "data be equal to the existing array with the inserted row truncated and flattened" do
+    assert_equal [5,1,6,2,7,3,8,4], @subject.data
+  end
+  
+  must "have row_count == 4" do
+    assert_equal 4, @subject.row_count
+  end
+  
+  must "have col_count == 2" do
+    assert_equal 2, @subject.col_count
+  end
+  
+end
+
+class TableInsertColTest_BeforeWhenLessRows < Test::Unit::TestCase
+
+  def setup
+    @input = [5]
+    @subject = RMU::Data::Table.new([[1],[2],[3],[4]])
+    @subject.insert_col(@input, :before => 0)
+  end
+  
+  must "data be equal to the existing array with the inserted col padded and flattened" do
+    assert_equal [5,1,nil,2,nil,3,nil,4], @subject.data
+  end
+  
+  must "have row_count == 4" do
+    assert_equal 4, @subject.row_count
+  end
+  
+  must "have col_count == 2" do
+    assert_equal 2, @subject.col_count
+  end
+  
+end
+
+
+class TableInsertColTest_BeforeWhenThreeColsSpecifyingNumber < Test::Unit::TestCase
+
+  def setup
+    @input = [2,6,10]
+    @subject = RMU::Data::Table.new([[1,3,4],[5,7,8],[9,11,12]])
+    @subject.insert_col(@input, 1)
+  end
+  
+  must "data be equal to the existing array with the inserted col flattened" do
+    assert_equal [1,2,3,4,5,6,7,8,9,10,11,12], @subject.data
+  end
+  
+  must "have row_count == size of input array" do
+    assert_equal 3, @subject.row_count
+  end
+  
+  must "have col_count == 4" do
+    assert_equal 4, @subject.col_count
+  end
+  
+end
+
+#----------------------------------------
+#  Tests of inserts after
+#----------------------------------------
+
+# TODO
+
 __END__
+
 # Possibly this case should raise error instead
 class TableInsertColTest_WhenSimpleNumericValue < Test::Unit::TestCase
 

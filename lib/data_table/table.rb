@@ -12,8 +12,8 @@ class Table
     @data = []
     init_caches
     init_headers(opts[:headers] || [])
-    rdata = [rdata] unless rdata.first.is_a?(Array)
     unless rdata.empty? 
+      rdata = [rdata] unless rdata.first.is_a?(Array)
       rdata.each {|r| append_row(r)}
     end
   end
@@ -123,7 +123,7 @@ class Table
     input = args.flatten
     
     # get input column count and assign default headers
-    init_blank_headers(input.size) if @headers.empty?
+    init_blank_headers(input.size) if headers.empty?
     
     # pad or truncate row based on headers
     input = normalized_columns(input)
@@ -190,13 +190,13 @@ class Table
         if name
           insert_header((-1 * after), name)
         else
-          init_blank_headers(@headers.size + 1)
+          init_blank_headers(headers.size + 1)
         end
         
       end
     
       if before
-        before = [before, col_count].min
+        before = [before, (col_count - 1)].min
         i = -1
         @data = \
           @data.inject([]) do |memo, it|
@@ -211,7 +211,7 @@ class Table
         if name
           insert_header(before, name)
         else
-          init_blank_headers(@headers.size + 1)
+          init_blank_headers(headers.size + 1)
         end
       end
 
@@ -220,6 +220,8 @@ class Table
     init_caches
     self
   end
+  
+  # TODO
   
   def delete_row(n)
   end
@@ -235,12 +237,12 @@ class Table
   
 
   def header(n)
+    headers[n]
   end
   
   # Call from Col#header=
   def update_header(ncol_or_name, name)
   end
-  
   
   def cell_value(nrow, ncol_or_name)
   end
