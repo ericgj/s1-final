@@ -26,6 +26,21 @@ class Table
     col_count == 0 ? 0 : (data.size/col_count).to_i
   end
   
+  def header(n_or_name)
+    headers[header_index(n_or_name)]
+  end
+  
+  def header_index(n_or_name)
+    idx = \
+      if Numeric === n_or_name && n_or_name < col_count
+        n_or_name >= 0 ? n_or_name : col_count + n_or_name
+      else
+        headers.index(n_or_name)
+      end
+    raise ArgumentError, "Unknown header or column index '#{n_or_name}'" if idx == nil
+    idx
+  end
+  
   def row(n)
     return nil unless n < row_count
     @row_cache[n] ||= Row.new(self, n)
@@ -44,63 +59,17 @@ class Table
     @cell_cache[[nrow, ncol]] ||= Data::Cell.new(self, nrow, ncol)
   end
   
-  # for chaining predicate conditions
-  # usage:
-  #   table.rows_where(0..10) {|row| row['column1'].value == 'foo'}
-  #   table.each_row {...}  # selects for condition from rows 0..10
-  #
-  def rows_where(enum = nil, &blk)
-    if enum == true  # reset
-      @_row_enum = nil
-      @_row_scopes = []
-    else
-      if enum
-        @_row_enum = enum
-      end
-    end
-    if block_given?
-      (@_row_scopes ||= []) << blk
-    end
-    self
+  def rows
+    @rows ||= ScopedCollection.new(self, :row, (0..(row_count-1)))
+  end
+
+  def cols
+    @cols ||= ScopedCollection.new(self, :col, (0..(col_count-1)))
   end
   
-  # iterators -- maybe better to extract these into Rows, Cols < Array ?
-  #
-  def rows(enum = nil)
-    enum ||= (0..(row_count -1))
-    enum.map {|i| row(i)}
-  end
   
-  def cols(enum = nil)
-    enum ||= (0..(col_count -1))
-    enum.map {|i| col(i)}
-  end
+  # ----  Methods below change table data state
   
-  def each_row
-    @_row_enum ||= (0..(row_count - 1))
-    base = rows(@_row_enum)
-    (@_row_scopes ||= []).each do |scope|
-      base = base.select(&scope)
-    end
-    base.each {|r| yield(r)}
-  end
-  
-  def each_col
-  end
-  
-  def find_row(range = nil)
-  end
-  
-  def find_col(range = nil)
-  end
-  
-  def map_row(range = nil)
-  end
-  
-  def map_col(range = nil)
-  end
-  
- 
   def append_row(*args)
     insert_row(*args)
   end
@@ -208,21 +177,7 @@ class Table
   end
   
 
-  def header(n_or_name)
-    headers[header_index(n_or_name)]
-  end
-  
-  def header_index(n_or_name)
-    idx = \
-      if Numeric === n_or_name && n_or_name < col_count
-        n_or_name >= 0 ? n_or_name : col_count + n_or_name
-      else
-        headers.index(n_or_name)
-      end
-    raise ArgumentError, "Unknown header or column index '#{n_or_name}'" if idx == nil
-    idx
-  end
-  
+
   # Call from Col#header=
   def update_header(ncol_or_name, name)
   end

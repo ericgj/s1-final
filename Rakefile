@@ -1,6 +1,7 @@
+task :default => ['test:all']
 
 namespace :test do
-
+    
   task :unit do
     puts "-----------------------\nUnit tests\n-----------------------"
     Dir['test/unit/**/*.rb'].each do |f| 
@@ -9,4 +10,8 @@ namespace :test do
     end
   end
 
+  task :all do
+    Rake::Task['test:unit'].execute    
+  end
+  
 end

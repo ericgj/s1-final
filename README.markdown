@@ -3,6 +3,8 @@
 
 (See REQUIREMENTS for description of the problem.)
 
+To run the tests, `rake`.
+
 #### 21 Sept
 
 The following requirements are implemented:
@@ -17,8 +19,8 @@ The following requirements are implemented:
 - col insert
 - col get (not formally tested)
 - cell contents get and set (not formally tested)
-- row map (not formally tested)
-- col map (not formally tested)
+- row map (not formally tested, underlying class tested)
+- col map (not formally tested, underlying class tested)
 
 These requirements are sketched but not yet implemented:
 
@@ -34,6 +36,6 @@ My general priorities right now are to
 1. Focus on the requirements left for the testing scenario.
 2. Concentrate on having a good test suite, which will make it easier to do the various refactorings needed.  
 
-The Table class in my implementation is necessarily dense as that's where all the real state is controlled from, but it could still be refactored a bit, particularly regarding the headers and row/col collections.  But my plan is to focus on the requirements first and the refactoring second.
+The Table class in my implementation is necessarily dense as that's where all the real state is controlled from.  I have tried to clean it up a bit, and refactored out the row/col collections.  I plan to do the same for the headers.  But my plan is to focus on the requirements first and the refactoring second.
 
 
