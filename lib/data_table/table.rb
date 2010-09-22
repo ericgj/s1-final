@@ -27,73 +27,77 @@ class Table
   end
   
   def row(n)
-    return nil unless n <= row_count
+    return nil unless n < row_count
     @row_cache[n] ||= Row.new(self, n)
   end
   
   def col(n_or_name)
-    n = headers.index {|h| h == n_or_name} || n_or_name
-    return nil unless n && n <= col_count
+    n = header_index(n_or_name)
+    return nil unless n < col_count
     @col_cache[n] ||= Col.new(self, n)
   end
   
   def cell(nrow, ncol_or_name)
-    ncol = headers.index {|h| h == ncol_or_name} || ncol_or_name
-    return nil unless nrow <= row_count
-    return nil unless ncol && n <= col_count
+    ncol = header_index(ncol_or_name)
+    return nil unless nrow < row_count
+    return nil unless ncol < col_count
     @cell_cache[[nrow, ncol]] ||= Data::Cell.new(self, nrow, ncol)
+  end
+  
+  # for chaining predicate conditions
+  # usage:
+  #   table.rows_where(0..10) {|row| row['column1'].value == 'foo'}
+  #   table.each_row {...}  # selects for condition from rows 0..10
+  #
+  def rows_where(enum = nil, &blk)
+    if enum == true  # reset
+      @_row_enum = nil
+      @_row_scopes = []
+    else
+      if enum
+        @_row_enum = enum
+      end
+    end
+    if block_given?
+      (@_row_scopes ||= []) << blk
+    end
+    self
   end
   
   # iterators -- maybe better to extract these into Rows, Cols < Array ?
   #
-  def rows(range = nil)
-    range ||= (0..row_count)
-    range.map {|i| row(i)}
+  def rows(enum = nil)
+    enum ||= (0..(row_count -1))
+    enum.map {|i| row(i)}
   end
   
-  def cols(range = nil)
-    range ||= (0..col_count)
-    range.map {|i| col(i)}
+  def cols(enum = nil)
+    enum ||= (0..(col_count -1))
+    enum.map {|i| col(i)}
   end
   
   def each_row
-    (0..row_count).each {|i| yield(row(i))}
+    @_row_enum ||= (0..(row_count - 1))
+    base = rows(@_row_enum)
+    (@_row_scopes ||= []).each do |scope|
+      base = base.select(&scope)
+    end
+    base.each {|r| yield(r)}
   end
   
   def each_col
-    (0..col_count).each {|i| yield(col(i))}
-  end
-  
-  def select_rows(range = nil)
-    range ||= (0..row_count)
-    idxs = range.select {|i| yield(row(i)) }
-    idxs.map {|i| row(i)}
-  end
-  
-  def select_cols(range = nil)
-    range ||= (0..col_count)
-    idxs = range.select {|i| yield(col(i)) }
-    idxs.map {|i| col(i)}
   end
   
   def find_row(range = nil)
-    range ||= (0..row_count)
-    idxs = range.find {|i| yield(row(i)) }
-    idxs.map {|i| row(i)}
   end
   
   def find_col(range = nil)
-    range ||= (0..col_count)
-    idxs = range.find {|i| yield(col(i)) }
-    idxs.map {|i| col(i)}
   end
   
   def map_row(range = nil)
-    rows(range).map {|i| yield(row(i))}
   end
   
   def map_col(range = nil)
-    cols(range).map {|i| yield(col(i))}
   end
   
  
@@ -224,10 +228,14 @@ class Table
   end
   
   def cell_value(nrow, ncol_or_name)
+    ncol = header_index(ncol_or_name)
+    @data[(nrow * (col_count)) + ncol]
   end
   
-  # Call from Data::Cell#value=
+  # Call from Data::Cell#value=, #update
   def update_cell_value(nrow, ncol_or_name, value)
+    ncol = header_index(ncol_or_name)
+    @data.fill((nrow * (col_count-1)) + ncol,1) {|i| value}
   end
   
   

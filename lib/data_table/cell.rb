@@ -11,7 +11,7 @@ module Data
     def col_header; @table.header(@cindex); end
     def row; @table.row(@rindex); end
     def col; @table.col(@cindex); end
-    
+        
     def value
       @table.cell_value(@rindex, @cindex)
     end
@@ -20,6 +20,11 @@ module Data
       @table.update_cell_value(@rindex, @cindex, it)
     end
     
+    def fill(&blk)
+      return unless block_given?
+      @table.update_cell_value(@rindex, @cindex, yield(value))
+    end
+    alias_method :update, :fill
     
   end
 end

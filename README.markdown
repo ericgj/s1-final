@@ -11,18 +11,18 @@ The following requirements are implemented:
 - row append
 - row insert
 - row delete
-- row get (not tested)
+- row get (not formally tested)
 - col append
 - col delete
 - col insert
-- col get (not tested)
+- col get (not formally tested)
+- cell contents get and set (not formally tested)
+- row map (not formally tested)
+- col map (not formally tested)
 
 These requirements are sketched but not yet implemented:
 
 - column headers
-- cell contents get and set
-- row map
-- col map
 - table reduce by row
 - table reduce by col
 
