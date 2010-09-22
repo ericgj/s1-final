@@ -36,7 +36,7 @@ namespace :scenario do
     
     reduced_rows_table = \
       input_table.select do |rows|
-        rows.where {|row| row['PROCEDURE_DATE'] ~= /06\/\d\d\/10/ }
+        rows.where {|row| row['PROCEDURE_DATE'] =~ /06\/\d\d\/10/ }
       end
 
     reduced_rows_table.delete_col('Count')
