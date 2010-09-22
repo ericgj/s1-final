@@ -11,7 +11,14 @@ module Data
     def col_header; @table.header(@cindex); end
     def row; @table.row(@rindex); end
     def col; @table.col(@cindex); end
-        
+         
+    def row?(n); n == row_index; end
+    
+    def col?(n_or_name)
+      n_or_name == col_index || \
+        n_or_name == col_header
+    end
+    
     def value
       @table.cell_value(@rindex, @cindex)
     end

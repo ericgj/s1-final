@@ -11,8 +11,6 @@
 #   col.values {|v| v += 1 }   #=> array of copy of cell values
 #
 
-# TODO add [] indexable by row
-
 module RMU
 module Data
 
@@ -41,6 +39,13 @@ class Column
     self
   end
   alias_method :each_cell, :each
+  
+  def [](n)
+    return nil unless n
+    find do |cell| 
+      cell.row?(n)
+    end
+  end
   
   def each_value
     each {|cell| yield(cell.value) }

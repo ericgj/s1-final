@@ -5,7 +5,7 @@
 
 To run the tests, `rake`.
 
-#### 21 Sept
+#### 22 Sept
 
 The following requirements are implemented:
 
@@ -21,12 +21,12 @@ The following requirements are implemented:
 - cell contents get and set (not formally tested)
 - row map (not formally tested, underlying class tested)
 - col map (not formally tested, underlying class tested)
+- table reduce by row (not formally tested)
+- table reduce by col (not formally tested)
 
-These requirements are sketched but not yet implemented:
+These requirements are incompletely implemented:
 
 - column headers
-- table reduce by row
-- table reduce by col
 
 And the testing scenario is not yet written.
 

@@ -1,4 +1,4 @@
-require 'lib/data/scoped_collection'
+require 'lib/data_table/scoped_collection'
 require 'lib/data_table/table'
 require 'lib/data_table/cell'
 require 'lib/data_table/row'

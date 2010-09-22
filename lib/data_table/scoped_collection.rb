@@ -48,7 +48,11 @@ class ScopedCollection
 
   def resolved_scope
     @_enum ||= @_default_enum
-    base = @_target.__send__(@_meth, @_enum)
+    base = \
+      @_enum.inject([]) do |memo, i|
+        memo << @_target.__send__(@_meth, i)
+        memo
+      end
     (@_scopes ||= []).each do |scope|
       base = base.select(&scope)
     end

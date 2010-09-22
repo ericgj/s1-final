@@ -4,7 +4,7 @@ module Data
 class Table
 
   attr_reader :data
-  attr_accessor :headers
+  attr_reader :headers
   
   DEFAULT_OPTIONS = {}
     
@@ -67,6 +67,31 @@ class Table
     @cols ||= ScopedCollection.new(self, :col, (0..(col_count-1)))
   end
   
+  # Usage: 
+  #
+  # table.select('column1','column2') do |rows| 
+  #   rows.where {|row| row['column3'].value == 'foo'}
+  #   rows.where {|row| row['status'].value > 0 }
+  # end
+  # #=> Table.new
+  #
+  # Equivalent to SELECT 'column1', 'column2'
+  #               WHERE 'column3' == 'foo' AND 'status' > 0
+  #
+  def select(*args)
+    idxs = args.flatten.map {|arg| header_index(arg)}
+    hdrs = args.flatten.map {|arg| header(arg)}
+    rows.where(true); yield(rows)
+    Table.new(
+      rows.inject([]) do |memo, row| 
+        memo << row.select do |cell| 
+          idxs.include?(cell.col_index)
+        end.map(&:value)
+        memo
+      end,
+      :headers => hdrs
+    )
+  end
   
   # ----  Methods below change table data state
   
@@ -180,6 +205,7 @@ class Table
 
   # Call from Col#header=
   def update_header(ncol_or_name, name)
+    headers[header_index(ncol_or_name)] = name
   end
   
   def cell_value(nrow, ncol_or_name)
@@ -198,6 +224,7 @@ class Table
   
   def init_caches
     @row_cache, @col_cache, @cell_cache = {}, {}, {}
+    @rows, @cols = nil, nil
   end
   
   #TODO: these header operations should be moved to a separate class
