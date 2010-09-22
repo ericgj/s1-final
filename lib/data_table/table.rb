@@ -1,21 +1,39 @@
 
 module RMU
 module Data
+  class IllegalFormatError < StandardError; end
+  
 class Table
-
+  extend ::Loadable
+  
   attr_reader :data
   attr_reader :headers
   
   DEFAULT_OPTIONS = {}
-    
+   
+  parse_from(:yaml) do |input, opts|
+    require 'yaml'
+    yaml = YAML.load(input)
+    raise RMU::Data::IllegalFormatError unless yaml.is_a?(Array)
+    new(yaml, DEFAULT_OPTIONS.merge(opts))
+  end
+  
   def initialize(rdata = [], opts = DEFAULT_OPTIONS)
     @data = []
     init_caches
-    init_headers(opts[:headers] || [])
+
     unless rdata.empty? 
       rdata = [rdata] unless rdata.first.is_a?(Array)
-      rdata.each {|r| append_row(r)}
     end
+    
+    init_headers([])
+    case hdrs = opts[:headers]
+    when Array
+      init_headers(hdrs)
+    when TrueClass
+      init_headers(rdata.shift) unless rdata.empty?
+    end
+    rdata.each {|r| append_row(r)}
   end
    
   def col_count

@@ -1,5 +1,5 @@
 require 'test/helper'
-require 'lib/data_table/table'
+require 'lib/data_table'
 
 #----------------------------------------
 #  Tests of default inserts (appends) into empty table

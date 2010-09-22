@@ -1,5 +1,5 @@
 require 'test/helper'
-require 'lib/data_table/table'
+require 'lib/data_table'
 
 class TableDeleteColTest_WhenEmpty < Test::Unit::TestCase
 

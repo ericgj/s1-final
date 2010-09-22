@@ -1,5 +1,5 @@
 require 'test/helper'
-require 'lib/data_table/table'
+require 'lib/data_table'
 
 class TableNewTest_WhenNoArgs < Test::Unit::TestCase
 
@@ -91,3 +91,7 @@ class TableNewTest_WhenComplexArray < Test::Unit::TestCase
   end
   
 end
+
+
+#TODO: when :headers => true
+#

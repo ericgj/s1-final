@@ -45,8 +45,8 @@ namespace :scenario do
       cell.value = \
         cell.value.gsub(
           /(\d\d)\/(\d\d)\/(\d\d)/,
-          "20#{$3}-#{$1}-#{$2}"
-        )  # whatever the syntax is, this isn't quite right
+          '20\3-\1-\2'
+        )
     end
     
     reduced_rows_table.dump(

@@ -49,9 +49,14 @@ class ScopedCollection
   def resolved_scope
     @_enum ||= @_default_enum
     base = \
-      @_enum.inject([]) do |memo, i|
-        memo << @_target.__send__(@_meth, i)
-        memo
+      case @_enum
+      when Numeric
+        @_target.__send__(@_meth, @_enum)
+      else
+        @_enum.inject([]) do |memo, i|
+          memo << @_target.__send__(@_meth, i)
+          memo
+        end
       end
     (@_scopes ||= []).each do |scope|
       base = base.select(&scope)
