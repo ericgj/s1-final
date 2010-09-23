@@ -245,7 +245,7 @@ class Table
   # Call from Data::Cell#value=, #update
   def update_cell_value!(nrow, ncol_or_name, value)
     ncol = header_index(ncol_or_name)
-    @data.fill((nrow * (col_count-1)) + ncol,1) {|i| value}
+    @data.fill((nrow * (col_count)) + ncol,1) {|i| value}
   end
   
   
