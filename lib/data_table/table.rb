@@ -20,20 +20,20 @@ class Table
   
   def initialize(rdata = [], opts = DEFAULT_OPTIONS)
     @data = []
-    init_caches
+    init_caches!
 
     unless rdata.empty? 
       rdata = [rdata] unless rdata.first.is_a?(Array)
     end
     
-    init_headers([])
+    init_headers!([])
     case hdrs = opts[:headers]
     when Array
-      init_headers(hdrs)
+      init_headers!(hdrs)
     when TrueClass
-      init_headers(rdata.shift) unless rdata.empty?
+      init_headers!(rdata.shift) unless rdata.empty?
     end
-    rdata.each {|r| append_row(r)}
+    rdata.each {|r| append_row!(r)}
   end
    
   def col_count
@@ -113,12 +113,12 @@ class Table
   
   # ----  Methods below change table data state
   
-  def append_row(*args)
-    insert_row(*args)
+  def append_row!(*args)
+    insert_row!(*args)
   end
   
-  def append_col(*args)
-    insert_col(*args)
+  def append_col!(*args)
+    insert_col!(*args)
   end
   
   # signatures:
@@ -126,7 +126,7 @@ class Table
   #   Array, Numeric  insert 1 row before n row
   #   Array, Hash     insert 1 row :after => n or :before => n
   #
-  def insert_row(*args)
+  def insert_row!(*args)
     after, before = nil, nil
     opts = (Hash === args.last || Numeric === args.last) ? args.pop : {}
     case opts
@@ -139,7 +139,7 @@ class Table
     input = args.flatten
     
     # get input column count and assign default headers
-    init_blank_headers(input.size) if headers.empty?
+    init_blank_headers!(input.size) if headers.empty?
     
     # pad or truncate row based on headers
     input = normalized_columns(input)
@@ -156,7 +156,7 @@ class Table
       end
     end
     
-    init_caches
+    init_caches!
     self
   end
   
@@ -165,7 +165,7 @@ class Table
   #   Array, Numeric  insert 1 cols before n row
   #   Array, Hash     insert 1 cols :after => n or :before => n
   #
-  def insert_col(*args)
+  def insert_col!(*args)
     after, before = nil, nil
     opts = (Hash === args.last || Numeric === args.last) ? args.pop : {}
     case opts
@@ -198,21 +198,21 @@ class Table
     end
     
     ### Note not needed: done in col_insert_* methods
-    # init_caches
+    # init_caches!
     self
   end
   
-  def delete_row_data(n)
+  def delete_row_data!(n)
     return self if row_count == 0
     n = [n, (row_count - 1)].min
     @data.slice!(
       index_of_row_start(n)..(index_of_next_row_start(n)-1)
     )
-    init_caches
+    init_caches!
     self
   end
     
-  def delete_col_data(n_or_name)
+  def delete_col_data!(n_or_name)
     return self if col_count == 0
     n = header_index(n_or_name)
     col_delete!(n)
@@ -222,7 +222,7 @@ class Table
 
 
   # Call from Col#header=
-  def update_header(ncol_or_name, name)
+  def update_header!(ncol_or_name, name)
     headers[header_index(ncol_or_name)] = name
   end
   
@@ -232,7 +232,7 @@ class Table
   end
   
   # Call from Data::Cell#value=, #update
-  def update_cell_value(nrow, ncol_or_name, value)
+  def update_cell_value!(nrow, ncol_or_name, value)
     ncol = header_index(ncol_or_name)
     @data.fill((nrow * (col_count-1)) + ncol,1) {|i| value}
   end
@@ -240,29 +240,29 @@ class Table
   
   protected
   
-  def init_caches
+  def init_caches!
     @row_cache, @col_cache, @cell_cache = {}, {}, {}
     @rows, @cols = nil, nil
   end
   
   #TODO: these header operations should be moved to a separate class
   
-  def init_headers(names = [])
+  def init_headers!(names = [])
     names = [names] unless names.is_a?(Array)
     @headers = []
     names.each_with_index {|name, i| @headers[i] = name}
   end
   
-  def init_blank_headers(n)
+  def init_blank_headers!(n)
     @headers = []
     (0..(n-1)).each {|i| @headers[i] = nil} if n > 0
   end
   
-  def insert_header(at, name)
+  def insert_header!(at, name)
     @headers.insert(at, name)
   end
   
-  def delete_header(at)
+  def delete_header!(at)
     @headers.delete_at(at)
   end
   
@@ -308,8 +308,8 @@ class Table
   
   def col_init!(cdata, name = nil)
     @data = cdata
-    name ? init_headers(name) : init_blank_headers(1)
-    init_caches
+    name ? init_headers!(name) : init_blank_headers!(1)
+    init_caches!
     self
   end
   
@@ -327,11 +327,11 @@ class Table
       end
       
     if name
-      insert_header(pos, name)
+      insert_header!(pos, name)
     else
-      init_blank_headers(headers.size + 1)
+      init_blank_headers!(headers.size + 1)
     end
-    init_caches
+    init_caches!
     self
   end
   
@@ -348,11 +348,11 @@ class Table
         memo
       end
     if name
-      insert_header((-1 * pos), name)
+      insert_header!((-1 * pos), name)
     else
-      init_blank_headers(headers.size + 1)
+      init_blank_headers!(headers.size + 1)
     end
-    init_caches
+    init_caches!
     self
   end
   
@@ -367,8 +367,8 @@ class Table
         end
         memo
       end
-    delete_header(pos)
-    init_caches
+    delete_header!(pos)
+    init_caches!
     self
   end
   

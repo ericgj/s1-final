@@ -10,7 +10,7 @@ class TableInsertColTest_WhenNoArgs < Test::Unit::TestCase
     @subject = RMU::Data::Table.new
     @orig_headers = @subject.headers.dup
     @orig_data = @subject.data.dup
-    @subject.insert_col
+    @subject.insert_col!
   end
   
   must "data be equal to original state" do
@@ -29,7 +29,7 @@ class TableInsertColTest_WhenEmptyArray < Test::Unit::TestCase
     @subject = RMU::Data::Table.new
     @orig_headers = @subject.headers.dup
     @orig_data = @subject.data.dup
-    @subject.insert_col([])
+    @subject.insert_col!([])
   end
   
   must "data be equal to original state" do
@@ -47,7 +47,7 @@ class TableInsertColTest_WhenSimpleNonNumericValue < Test::Unit::TestCase
   def setup
     @input = 'a'
     @subject = RMU::Data::Table.new
-    @subject.insert_col(@input)
+    @subject.insert_col!(@input)
   end
   
   must "data be equal to array of input" do
@@ -69,7 +69,7 @@ class TableInsertColTest_WhenSimpleNonNumericValues < Test::Unit::TestCase
   def setup
     @input = %w{a b c d}
     @subject = RMU::Data::Table.new
-    @subject.insert_col(*@input)
+    @subject.insert_col!(*@input)
   end
   
   must "data be equal to given array" do
@@ -95,7 +95,7 @@ class TableInsertColTest_BeforeWhenEmpty < Test::Unit::TestCase
   def setup
     @input = [1,2,3,4]
     @subject = RMU::Data::Table.new
-    @subject.insert_col(@input, :before => 99)
+    @subject.insert_col!(@input, :before => 99)
   end
   
   must "data be equal to the given array flattened" do
@@ -117,7 +117,7 @@ class TableInsertColTest_BeforeWhenOneCol < Test::Unit::TestCase
   def setup
     @input = [5,6,7,8]
     @subject = RMU::Data::Table.new([[1],[2],[3],[4]])
-    @subject.insert_col(@input, :before => 0)
+    @subject.insert_col!(@input, :before => 0)
   end
   
   must "data be equal to the existing array with the inserted col flattened" do
@@ -139,7 +139,7 @@ class TableInsertColTest_BeforeWhenOneColAfterEOF < Test::Unit::TestCase
   def setup
     @input = [5,6,7,8]
     @subject = RMU::Data::Table.new([[1],[2],[3],[4]])
-    @subject.insert_col(@input, :before => 2)
+    @subject.insert_col!(@input, :before => 2)
   end
   
   must "data be equal to the existing array with the inserted row flattened" do
@@ -161,7 +161,7 @@ class TableInsertColTest_BeforeWhenThreeCols < Test::Unit::TestCase
   def setup
     @input = [2,6,10]
     @subject = RMU::Data::Table.new([[1,3,4],[5,7,8],[9,11,12]])
-    @subject.insert_col(@input, :before => 1)
+    @subject.insert_col!(@input, :before => 1)
   end
   
   must "data be equal to the existing array with the inserted col flattened" do
@@ -183,7 +183,7 @@ class TableInsertColTest_BeforeWhenMoreRows < Test::Unit::TestCase
   def setup
     @input = [5,6,7,8,9,10,11,12]
     @subject = RMU::Data::Table.new([[1],[2],[3],[4]])
-    @subject.insert_col(@input, :before => 0)
+    @subject.insert_col!(@input, :before => 0)
   end
   
   must "data be equal to the existing array with the inserted row truncated and flattened" do
@@ -205,7 +205,7 @@ class TableInsertColTest_BeforeWhenLessRows < Test::Unit::TestCase
   def setup
     @input = [5]
     @subject = RMU::Data::Table.new([[1],[2],[3],[4]])
-    @subject.insert_col(@input, :before => 0)
+    @subject.insert_col!(@input, :before => 0)
   end
   
   must "data be equal to the existing array with the inserted col padded and flattened" do
@@ -228,7 +228,7 @@ class TableInsertColTest_BeforeWhenThreeColsSpecifyingNumber < Test::Unit::TestC
   def setup
     @input = [2,6,10]
     @subject = RMU::Data::Table.new([[1,3,4],[5,7,8],[9,11,12]])
-    @subject.insert_col(@input, 1)
+    @subject.insert_col!(@input, 1)
   end
   
   must "data be equal to the existing array with the inserted col flattened" do
@@ -260,7 +260,7 @@ class TableInsertColTest_AfterWhenEmpty < Test::Unit::TestCase
   def setup
     @input = [1,2,3,4]
     @subject = RMU::Data::Table.new
-    @subject.insert_col(@input, :after => 99)
+    @subject.insert_col!(@input, :after => 99)
   end
   
   must "data be equal to the given array flattened" do
@@ -282,7 +282,7 @@ class TableInsertColTest_AfterWhenOneCol < Test::Unit::TestCase
   def setup
     @input = [5,6,7,8]
     @subject = RMU::Data::Table.new([[1],[2],[3],[4]])
-    @subject.insert_col(@input, :after => 0)
+    @subject.insert_col!(@input, :after => 0)
   end
   
   must "data be equal to the existing array with the inserted col flattened" do
@@ -305,7 +305,7 @@ class TableInsertColTest_AfterWhenOneColAfterEOF < Test::Unit::TestCase
   def setup
     @input = [5,6,7,8]
     @subject = RMU::Data::Table.new([[1],[2],[3],[4]])
-    @subject.insert_col(@input, :after => 2)
+    @subject.insert_col!(@input, :after => 2)
   end
   
   must "data be equal to the existing array with the inserted col flattened" do
@@ -327,7 +327,7 @@ class TableInsertColTest_AfterWhenThreeCols < Test::Unit::TestCase
   def setup
     @input = [2,6,10]
     @subject = RMU::Data::Table.new([[1,3,4],[5,7,8],[9,11,12]])
-    @subject.insert_col(@input, :after => 0)
+    @subject.insert_col!(@input, :after => 0)
   end
   
   must "data be equal to the existing array with the inserted col flattened" do
@@ -349,7 +349,7 @@ class TableInsertColTest_AfterWhenMoreRows < Test::Unit::TestCase
   def setup
     @input = [5,6,7,8,9,10,11,12]
     @subject = RMU::Data::Table.new([[1],[2],[3],[4]])
-    @subject.insert_col(@input, :after => 0)
+    @subject.insert_col!(@input, :after => 0)
   end
   
   must "data be equal to the existing array with the inserted row truncated and flattened" do
@@ -371,7 +371,7 @@ class TableInsertColTest_AfterWhenLessRows < Test::Unit::TestCase
   def setup
     @input = [5]
     @subject = RMU::Data::Table.new([[1],[2],[3],[4]])
-    @subject.insert_col(@input, :after => 0)
+    @subject.insert_col!(@input, :after => 0)
   end
   
   must "data be equal to the existing array with the inserted col padded and flattened" do
@@ -402,7 +402,7 @@ class TableInsertColTest_WhenSimpleNumericValue < Test::Unit::TestCase
     @subject = RMU::Data::Table.new
     @orig_headers = @subject.headers.dup
     @orig_data = @subject.data.dup
-    @subject.insert_col(1)
+    @subject.insert_col!(1)
   end
   
   must "have row_count == 0" do

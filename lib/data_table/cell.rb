@@ -24,12 +24,12 @@ module Data
     end
     
     def value=(it)
-      @table.update_cell_value(@rindex, @cindex, it)
+      @table.update_cell_value!(@rindex, @cindex, it)
     end
     
     def fill(&blk)
       return unless block_given?
-      @table.update_cell_value(@rindex, @cindex, yield(value))
+      @table.update_cell_value!(@rindex, @cindex, yield(value))
     end
     alias_method :update, :fill
     

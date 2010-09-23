@@ -8,7 +8,7 @@ class TableDeleteRowTest_WhenEmpty < Test::Unit::TestCase
     @subject = RMU::Data::Table.new
     @orig_headers = @subject.headers.dup
     @orig_data = @subject.data.dup
-    @subject.delete_row_data(0)
+    @subject.delete_row_data!(0)
   end
   
   must "data be equal to original state" do
@@ -26,7 +26,7 @@ class TableDeleteRowTest_WhenOneRowOneCol < Test::Unit::TestCase
   def setup
     @input = [1]
     @subject = RMU::Data::Table.new(@input)
-    @subject.delete_row_data(0)
+    @subject.delete_row_data!(0)
   end
   
   must "data be empty" do
@@ -48,7 +48,7 @@ class TableDeleteRowTest_WhenOneRowThreeCols < Test::Unit::TestCase
   def setup
     @input = [1,2,3]
     @subject = RMU::Data::Table.new(@input)
-    @subject.delete_row_data(0)
+    @subject.delete_row_data!(0)
   end
   
   must "data be empty" do
@@ -70,7 +70,7 @@ class TableDeleteRowTest_WhenThreeRowsOneCol < Test::Unit::TestCase
   def setup
     @input = [[1],[2],[3]]
     @subject = RMU::Data::Table.new(@input)
-    @subject.delete_row_data(1)
+    @subject.delete_row_data!(1)
   end
   
   must "data be missing the deleted row" do
@@ -92,7 +92,7 @@ class TableDeleteRowTest_WhenThreeRowsThreeCols < Test::Unit::TestCase
   def setup
     @input = [[1,2,3],[4,5,6],[7,8,9]]
     @subject = RMU::Data::Table.new(@input)
-    @subject.delete_row_data(2)
+    @subject.delete_row_data!(2)
   end
   
   must "data be missing the deleted row" do
@@ -114,7 +114,7 @@ class TableDeleteRowTest_WhenRowIndexAfterEOF < Test::Unit::TestCase
   def setup
     @input = [[1,2,3],[4,5,6],[7,8,9]]
     @subject = RMU::Data::Table.new(@input)
-    @subject.delete_row_data(3)
+    @subject.delete_row_data!(3)
   end
   
   must "data be missing the last row" do
@@ -138,7 +138,7 @@ class TableDeleteRowTest_WhenRowIndexNegative < Test::Unit::TestCase
   def setup
     @input = [[1,2,3],[4,5,6],[7,8,9]]
     @subject = RMU::Data::Table.new(@input)
-    @subject.delete_row_data(-2)
+    @subject.delete_row_data!(-2)
   end
   
   must "data be missing the 2nd row from the end" do

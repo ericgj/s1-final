@@ -29,7 +29,7 @@ class Column
   end
   
   def header=(value)
-    @table.update_header(@index, value)
+    @table.update_header!(@index, value)
   end
   
   def each

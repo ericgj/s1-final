@@ -10,7 +10,7 @@ class TableInsertRowTest_WhenNoArgs < Test::Unit::TestCase
     @subject = RMU::Data::Table.new
     @orig_headers = @subject.headers.dup
     @orig_data = @subject.data.dup
-    @subject.insert_row
+    @subject.insert_row!
   end
   
   must "data be equal to original state" do
@@ -29,7 +29,7 @@ class TableInsertRowTest_WhenEmptyArray < Test::Unit::TestCase
     @subject = RMU::Data::Table.new
     @orig_headers = @subject.headers.dup
     @orig_data = @subject.data.dup
-    @subject.insert_row([])
+    @subject.insert_row!([])
   end
   
   must "data be equal to original state" do
@@ -49,7 +49,7 @@ class TableInsertRowTest_WhenSimpleNumericValue < Test::Unit::TestCase
     @subject = RMU::Data::Table.new
     @orig_headers = @subject.headers.dup
     @orig_data = @subject.data.dup
-    @subject.insert_row(1)
+    @subject.insert_row!(1)
   end
   
   must "have row_count == 0" do
@@ -71,7 +71,7 @@ class TableInsertRowTest_WhenSimpleNonNumericValue < Test::Unit::TestCase
   def setup
     @input = 'a'
     @subject = RMU::Data::Table.new
-    @subject.insert_row(@input)
+    @subject.insert_row!(@input)
   end
   
   must "data be equal to array of input" do
@@ -93,7 +93,7 @@ class TableInsertRowTest_WhenSimpleNonNumericValues < Test::Unit::TestCase
   def setup
     @input = %w{a b c d}
     @subject = RMU::Data::Table.new
-    @subject.insert_row(*@input)
+    @subject.insert_row!(*@input)
   end
   
   must "data be equal to given array" do
@@ -115,7 +115,7 @@ class TableInsertRowTest_WhenSimpleArray < Test::Unit::TestCase
   def setup
     @input = [1,2,3,4]
     @subject = RMU::Data::Table.new
-    @subject.insert_row(@input)
+    @subject.insert_row!(@input)
   end
   
   must "data be equal to given array" do
@@ -143,7 +143,7 @@ class TableInsertRowTest_BeforeWhenEmpty < Test::Unit::TestCase
   def setup
     @input = [1,2,3,4]
     @subject = RMU::Data::Table.new
-    @subject.insert_row(@input, :before => 99)
+    @subject.insert_row!(@input, :before => 99)
   end
   
   must "data be equal to the given array flattened" do
@@ -165,7 +165,7 @@ class TableInsertRowTest_BeforeWhenOneRow < Test::Unit::TestCase
   def setup
     @input = [5,6,7,8]
     @subject = RMU::Data::Table.new([1,2,3,4])
-    @subject.insert_row(@input, :before => 0)
+    @subject.insert_row!(@input, :before => 0)
   end
   
   must "data be equal to the existing array with the inserted row flattened" do
@@ -187,7 +187,7 @@ class TableInsertRowTest_BeforeWhenOneRowAfterEOF < Test::Unit::TestCase
   def setup
     @input = [5,6,7,8]
     @subject = RMU::Data::Table.new([1,2,3,4])
-    @subject.insert_row(@input, :before => 2)
+    @subject.insert_row!(@input, :before => 2)
   end
   
   must "data be equal to the existing array with the inserted row flattened" do
@@ -209,7 +209,7 @@ class TableInsertRowTest_BeforeWhenThreeRows < Test::Unit::TestCase
   def setup
     @input = [5,6,7,8]
     @subject = RMU::Data::Table.new([[1,2,3,4],[9,10,11,12]])
-    @subject.insert_row(@input, :before => 1)
+    @subject.insert_row!(@input, :before => 1)
   end
   
   must "data be equal to the existing array with the inserted row flattened" do
@@ -231,7 +231,7 @@ class TableInsertRowTest_BeforeWhenMoreCols < Test::Unit::TestCase
   def setup
     @input = [5,6,7,8,9,10,11,12]
     @subject = RMU::Data::Table.new([1,2,3,4])
-    @subject.insert_row(@input, :before => 0)
+    @subject.insert_row!(@input, :before => 0)
   end
   
   must "data be equal to the existing array with the inserted row truncated and flattened" do
@@ -253,7 +253,7 @@ class TableInsertRowTest_BeforeWhenLessCols < Test::Unit::TestCase
   def setup
     @input = [5]
     @subject = RMU::Data::Table.new([1,2,3,4])
-    @subject.insert_row(@input, :before => 0)
+    @subject.insert_row!(@input, :before => 0)
   end
   
   must "data be equal to the existing array with the inserted row padded and flattened" do
@@ -275,7 +275,7 @@ class TableInsertRowTest_BeforeWhenThreeRowsSpecifyingNumber < Test::Unit::TestC
   def setup
     @input = [5,6,7,8]
     @subject = RMU::Data::Table.new([[1,2,3,4],[9,10,11,12]])
-    @subject.insert_row(@input, 1)
+    @subject.insert_row!(@input, 1)
   end
   
   must "data be equal to the existing array with the inserted row flattened" do
@@ -300,7 +300,7 @@ class TableInsertRowTest_AfterWhenEmpty < Test::Unit::TestCase
   def setup
     @input = [1,2,3,4]
     @subject = RMU::Data::Table.new
-    @subject.insert_row(@input, :after => 99)
+    @subject.insert_row!(@input, :after => 99)
   end
   
   must "data be equal to the given array flattened" do
@@ -322,7 +322,7 @@ class TableInsertRowTest_AfterWhenOneRow < Test::Unit::TestCase
   def setup
     @input = [5,6,7,8]
     @subject = RMU::Data::Table.new([1,2,3,4])
-    @subject.insert_row(@input, :after => 0)
+    @subject.insert_row!(@input, :after => 0)
   end
   
   must "data be equal to the existing array with the inserted row flattened" do
@@ -344,7 +344,7 @@ class TableInsertRowTest_AfterWhenOneRowAfterEOF < Test::Unit::TestCase
   def setup
     @input = [5,6,7,8]
     @subject = RMU::Data::Table.new([1,2,3,4])
-    @subject.insert_row(@input, :after => 2)
+    @subject.insert_row!(@input, :after => 2)
   end
   
   must "data be equal to the existing array with the inserted row flattened" do
@@ -366,7 +366,7 @@ class TableInsertRowTest_AfterWhenThreeRows < Test::Unit::TestCase
   def setup
     @input = [5,6,7,8]
     @subject = RMU::Data::Table.new([[1,2,3,4],[9,10,11,12]])
-    @subject.insert_row(@input, :after => 0)
+    @subject.insert_row!(@input, :after => 0)
   end
   
   must "data be equal to the existing array with the inserted row flattened" do
@@ -388,7 +388,7 @@ class TableInsertRowTest_AfterWhenMoreCols < Test::Unit::TestCase
   def setup
     @input = [5,6,7,8,9,10,11,12]
     @subject = RMU::Data::Table.new([1,2,3,4])
-    @subject.insert_row(@input, :after => 0)
+    @subject.insert_row!(@input, :after => 0)
   end
   
   must "data be equal to the existing array with the inserted row truncated and flattened" do
@@ -410,7 +410,7 @@ class TableInsertRowTest_AfterWhenLessCols < Test::Unit::TestCase
   def setup
     @input = [5]
     @subject = RMU::Data::Table.new([1,2,3,4])
-    @subject.insert_row(@input, :after => 0)
+    @subject.insert_row!(@input, :after => 0)
   end
   
   must "data be equal to the existing array with the inserted row padded and flattened" do

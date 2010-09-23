@@ -7,7 +7,7 @@ class TableDeleteColTest_WhenEmpty < Test::Unit::TestCase
     @subject = RMU::Data::Table.new
     @orig_headers = @subject.headers.dup
     @orig_data = @subject.data.dup
-    @subject.delete_col_data(0)
+    @subject.delete_col_data!(0)
   end
   
   must "data be equal to original state" do
@@ -25,7 +25,7 @@ class TableDeleteColTest_WhenOneRowOneCol < Test::Unit::TestCase
   def setup
     @input = [1]
     @subject = RMU::Data::Table.new(@input)
-    @subject.delete_col_data(0)
+    @subject.delete_col_data!(0)
   end
   
   must "data be empty" do
@@ -47,7 +47,7 @@ class TableDeleteColTest_WhenOneRowThreeCols < Test::Unit::TestCase
   def setup
     @input = [1,2,3]
     @subject = RMU::Data::Table.new(@input)
-    @subject.delete_col_data(1)
+    @subject.delete_col_data!(1)
   end
   
   must "data be missing the deleted col" do
@@ -69,7 +69,7 @@ class TableDeleteColTest_WhenThreeRowsOneCol < Test::Unit::TestCase
   def setup
     @input = [[1],[2],[3]]
     @subject = RMU::Data::Table.new(@input)
-    @subject.delete_col_data(0)
+    @subject.delete_col_data!(0)
   end
   
   must "data be empty" do
@@ -91,7 +91,7 @@ class TableDeleteColTest_WhenThreeRowsThreeCols < Test::Unit::TestCase
   def setup
     @input = [[1,2,3],[4,5,6],[7,8,9]]
     @subject = RMU::Data::Table.new(@input)
-    @subject.delete_col_data(2)
+    @subject.delete_col_data!(2)
   end
   
   must "data be missing the deleted col" do
@@ -118,7 +118,7 @@ class TableDeleteColTest_WhenColIndexAfterEOF < Test::Unit::TestCase
   
   must "raise error (column not found)" do
     assert_raise(ArgumentError) {
-      @subject.delete_col_data(3)
+      @subject.delete_col_data!(3)
     }
   end
   
@@ -129,7 +129,7 @@ class TableDeleteColTest_WhenColIndexNegative < Test::Unit::TestCase
   def setup
     @input = [[1,2,3],[4,5,6],[7,8,9]]
     @subject = RMU::Data::Table.new(@input)
-    @subject.delete_col_data(-2)
+    @subject.delete_col_data!(-2)
   end
   
   must "data be missing the 2nd col from the end" do
