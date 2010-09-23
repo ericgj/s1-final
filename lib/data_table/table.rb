@@ -5,6 +5,7 @@ module Data
   
 class Table
   extend ::Loadable
+  include ::Dumpable
   
   attr_reader :data
   attr_reader :headers
@@ -18,6 +19,18 @@ class Table
     new(yaml, DEFAULT_OPTIONS.merge(opts))
   end
   
+  dump_to_files_of_format(:yaml) do |table, output, opts|
+    require 'yaml'
+    output.print(
+      if opts[:headers]
+        YAML.dump([table.headers] + table.rows.map(&:values))
+      else
+        YAML.dump(table.rows.map(&:values))
+      end
+    )
+    output.flush
+  end
+  
   def initialize(rdata = [], opts = DEFAULT_OPTIONS)
     @data = []
     init_caches!
@@ -26,14 +39,17 @@ class Table
       rdata = [rdata] unless rdata.first.is_a?(Array)
     end
     
+    i = 0
     init_headers!([])
     case hdrs = opts[:headers]
     when Array
       init_headers!(hdrs)
     when TrueClass
-      init_headers!(rdata.shift) unless rdata.empty?
+      init_headers!(rdata.first) unless rdata.empty?
+      i = 1
     end
-    rdata.each {|r| append_row!(r)}
+    rdata[i..(rdata.size-1)].each {|r| append_row!(r)} \
+      unless rdata.empty? 
   end
    
   def col_count
@@ -97,16 +113,11 @@ class Table
   #               WHERE 'column3' == 'foo' AND 'status' > 0
   #
   def select(*args)
-    idxs = args.flatten.map {|arg| header_index(arg)}
+    args = headers if args.empty?
     hdrs = args.flatten.map {|arg| header(arg)}
     rows.where(true); yield(rows)
     Table.new(
-      rows.inject([]) do |memo, row| 
-        memo << row.select do |cell| 
-          idxs.include?(cell.col_index)
-        end.map(&:value)
-        memo
-      end,
+      rows.map(&:values),
       :headers => hdrs
     )
   end

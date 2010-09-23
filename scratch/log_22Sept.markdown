@@ -1,6 +1,5 @@
 ## Critical tests to do
 
-- Table.new :headers => true
 - Table.header, Table.header_index
 - Loadable.load and load_lines unit tests
 - Dumpable.dump unit tests
@@ -20,3 +19,8 @@
 
 - dumping
 - headers is not directly accessible; error if attempt to resize
+
+
+## Done
+
+- Table.new :headers => true

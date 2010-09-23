@@ -37,7 +37,8 @@ class ScopedCollection
   end
   
   def each
-    @_cache ||= resolved_scope.each {|r| yield(r)}
+    @_cache ||= resolved_scope
+    @_cache.each {|r| yield(r)}
   end
     
   protected
