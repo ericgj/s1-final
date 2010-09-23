@@ -11,7 +11,7 @@ class Table
   
   DEFAULT_OPTIONS = {}
    
-  parse_from(:yaml) do |input, opts|
+  load_files_of_format(:yaml) do |input, opts|
     require 'yaml'
     yaml = YAML.load(input)
     raise RMU::Data::IllegalFormatError unless yaml.is_a?(Array)

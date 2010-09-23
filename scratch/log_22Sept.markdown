@@ -2,7 +2,9 @@
 
 - Table.new :headers => true
 - Table.header, Table.header_index
-- Table.load functional tests
+- Loadable.load and load_lines unit tests
+- Dumpable.dump unit tests
+- Table.load_files_of_format, .load functional tests
 - Table.rows.where , .cols.where functional tests
 - Table.select functional tests
 

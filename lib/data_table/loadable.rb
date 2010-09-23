@@ -4,12 +4,12 @@
 # class Table
 #   extend Loadable
 #
-#   parse_lines_from :csv, opts do |table, input_row|
+#   load_lines_of_format :csv do |table, input_row, opts|
 #    table.append_row(input_row)
 #    table
 #   end
 #   
-#   parse_from :yaml, opts do |input|
+#   load_files_of_format :yaml do |input, opts|
 #    yaml = YAML.load(input)
 #    raise SomeInputError unless yaml.is_a?(Array)
 #    new(yaml, opts)
@@ -22,7 +22,7 @@
 
 module Loadable
 
-  def load(file, input_type, opts = {})
+  def load_from(file, input_type, opts = {})
     delim = opts[:delim] || $/
     if IO === file
       @_parser[input_type].call(io, opts) if @_parser[input_type]
@@ -32,8 +32,9 @@ module Loadable
       end
     end
   end
+  alias_method :load, :load_from
   
-  def load_lines(file, input_type, opts = {})
+  def load_lines_from(file, input_type, opts = {})
     delim = opts[:delim] || $/
     instance = new
     parser = lambda {|io|
@@ -47,14 +48,15 @@ module Loadable
       File.open(file, 'r') {|io| parser.call(io)}
     end
   end
+  alias_method :load_lines, :load_lines_from
 
-  def parse_from(input_type, &blk)
+  def load_files_of_format(input_type, &blk)
     @_parser ||= {}
     @_parser[input_type] = blk
   end
 
-  def parse_lines_from(input_type, &blk)
-    parse_from(input_type, &blk)
+  def load_lines_of_format(input_type, &blk)
+    load_format(input_type, &blk)
   end
   
 end
