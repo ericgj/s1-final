@@ -75,6 +75,18 @@ class Table
     idx
   end
   
+  # Not sure how useful caching the rows and cols are.
+  #   For example,
+  #       table.rows.where {|row| row['field'] == 'foo'}  
+  #   caches nrows Row + ncols Cell objects (potentially a lot).
+  #   Whereas if we just cached cells,
+  #       table.rows.where {|row| row['field'] == 'foo'}
+  #   caches just ncols Cell objects.
+  # On the other hand, when you then want to do something with the rows, e.g.
+  #       table.rows.map(&:values)
+  # Then it's going to have to load up all the Row objects again.
+  # The only way to know for sure is to do some performance testing.
+  #
   def row(n)
     return nil unless n < row_count
     @row_cache[n] ||= Row.new(self, n)
@@ -122,6 +134,9 @@ class Table
     )
   end
   
+  def reset; init_caches!; end
+  
+    
   # ----  Methods below change table data state
   
   def append_row!(*args)
