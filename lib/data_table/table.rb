@@ -75,16 +75,19 @@ class Table
     idx
   end
   
-  # Not sure how useful caching the rows and cols are.
+  # Not sure how useful caching the rows, cols and cells are.
   #   For example,
-  #       table.rows.where {|row| row['field'] == 'foo'}  
-  #   caches nrows Row + ncols Cell objects (potentially a lot).
-  #   Whereas if we just cached cells,
   #       table.rows.where {|row| row['field'] == 'foo'}
-  #   caches just ncols Cell objects.
-  # On the other hand, when you then want to do something with the rows, e.g.
   #       table.rows.map(&:values)
-  # Then it's going to have to load up all the Row objects again.
+  #   caches nrows Row + ncols * nrows Cell objects (potentially a lot).
+  #
+  # The only place it might be useful is if you want to do several things
+  # with a row or column, then it will save you creating the objects again.
+  #
+  # But it seems to me object creation in this case is cheap,
+  # my guess is the expensive thing is dereferencing a ton of objects
+  # at once which means the GC kicks in.
+  #
   # The only way to know for sure is to do some performance testing.
   #
   def row(n)
@@ -111,6 +114,11 @@ class Table
 
   def cols
     @cols ||= ScopedCollection.new(self, :col, (0..(col_count-1)))
+  end
+  
+  def cell_value(nrow, ncol_or_name)
+    ncol = header_index(ncol_or_name)
+    @data[(nrow * (col_count)) + ncol]
   end
   
   # Usage: 
@@ -250,11 +258,6 @@ class Table
   # Call from Col#header=
   def update_header!(ncol_or_name, name)
     headers[header_index(ncol_or_name)] = name
-  end
-  
-  def cell_value(nrow, ncol_or_name)
-    ncol = header_index(ncol_or_name)
-    @data[(nrow * (col_count)) + ncol]
   end
   
   # Call from Data::Cell#value=, #update

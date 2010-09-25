@@ -1,10 +1,9 @@
 ## Critical tests to do
 
-- Table.cell_value
 - Table.update_cell_value!
 - Table.header, Table.header_index
 - Table.update_header!
-- Table.col, Table.row
+- Table.col, Table.row + after ! methods
 - Loadable.load and load_lines unit tests
 - Dumpable.dump unit tests
 
@@ -23,3 +22,4 @@
 ## Done
 
 - Table.new :headers => true
+- Table.cell_value
