@@ -10,7 +10,7 @@ class Table
   attr_reader :data
   attr_reader :headers
   
-  DEFAULT_OPTIONS = {}
+  DEFAULT_OPTIONS = {:cache => true}
    
   load_files_of_format(:yaml) do |input, opts|
     require 'yaml'
@@ -33,6 +33,8 @@ class Table
   
   def initialize(rdata = [], opts = DEFAULT_OPTIONS)
     @data = []
+    @cache = (opts[:cache] == true)
+    
     init_caches!
 
     unless rdata.empty? 
@@ -50,7 +52,9 @@ class Table
     end
     rdata[i..(rdata.size-1)].each {|r| append_row!(r)} \
       unless rdata.empty? 
+      
   end
+   
    
   def col_count
     headers.size
@@ -92,20 +96,32 @@ class Table
   #
   def row(n)
     return nil unless n < row_count
-    @row_cache[n] ||= Row.new(self, n)
+    if @cache
+      @row_cache[n] ||= Row.new(self, n)
+    else
+      Row.new(self, n)
+    end
   end
   
   def col(n_or_name)
     n = header_index(n_or_name)
     return nil unless n < col_count
-    @col_cache[n] ||= Col.new(self, n)
+    if @cache
+      @col_cache[n] ||= Col.new(self, n)
+    else
+      Col.new(self, n)
+    end
   end
   
   def cell(nrow, ncol_or_name)
     ncol = header_index(ncol_or_name)
     return nil unless nrow < row_count
     return nil unless ncol < col_count
-    @cell_cache[[nrow, ncol]] ||= Data::Cell.new(self, nrow, ncol)
+    if @cache
+      @cell_cache[[nrow, ncol]] ||= Cell.new(self, nrow, ncol)
+    else
+      Cell.new(self, nrow, ncol)
+    end
   end
   
   def rows
@@ -231,8 +247,6 @@ class Table
         
     end
     
-    ### Note not needed: done in col_insert_* methods
-    # init_caches!
     self
   end
   
@@ -260,7 +274,7 @@ class Table
     headers[header_index(ncol_or_name)] = name
   end
   
-  # Call from Data::Cell#value=, #update
+  # Call from Cell#value=, #update
   def update_cell_value!(nrow, ncol_or_name, value)
     ncol = header_index(ncol_or_name)
     @data.fill((nrow * (col_count)) + ncol,1) {|i| value}
