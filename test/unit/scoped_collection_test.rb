@@ -1,5 +1,5 @@
 require 'test/helper'
-require 'lib/data_table/scoped_collection'
+require 'lib/scoped_collection'
 
 module ScopedCollectionTest
   class DummyTable
