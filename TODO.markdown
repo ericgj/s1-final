@@ -26,4 +26,5 @@
 ## New features
 
 - headers not directly accessible; error if attempt to resize
+- performance testing of caching rows/cols/cells vs. not caching
 
