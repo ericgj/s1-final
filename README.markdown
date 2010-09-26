@@ -6,7 +6,7 @@
 To run the tests, `rake`.
 
 To run the scenario against the sample data, `rake scenario:run`.
-Note the output file is `scenario\s1-exam-data-transformed.yaml`.
+Note the output file is `scenario/s1-exam-data-transformed.yaml`.
 
 #### 26 Sept
 
