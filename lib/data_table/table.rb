@@ -277,7 +277,10 @@ class Table
   # Call from Cell#value=, #update
   def update_cell_value!(nrow, ncol_or_name, value)
     ncol = header_index(ncol_or_name)
-    @data.fill((nrow * (col_count)) + ncol,1) {|i| value}
+    if (0..(row_count - 1)).include?(nrow) && \
+       (0..(col_count - 1)).include?(ncol)
+      @data.fill((nrow * (col_count)) + ncol,1) {|i| value}
+    end
   end
   
   
